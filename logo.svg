@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 150" role="img" aria-label="King of 3D">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#ff6b9d"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe07a"/>
+      <stop offset="1" stop-color="#f5a623"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Krona -->
+  <g transform="translate(14,14)">
+    <path d="M15,74 L15,40 L33,56 L50,22 L67,56 L85,40 L85,74 Z"
+          fill="url(#gold)" stroke="#e0951a" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="12" y="72" width="76" height="13" rx="5" fill="url(#gold)" stroke="#e0951a" stroke-width="2"/>
+    <circle cx="15" cy="40" r="5" fill="#fff7e0"/>
+    <circle cx="50" cy="22" r="6" fill="#fff7e0"/>
+    <circle cx="85" cy="40" r="5" fill="#fff7e0"/>
+    <circle cx="50" cy="78.5" r="3.5" fill="#e0951a"/>
+  </g>
+
+  <!-- Ordmärke -->
+  <text x="150" y="78" font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="62" font-weight="800" fill="#1f1b2e" letter-spacing="-1">King of <tspan fill="url(#brand)">3D</tspan></text>
+
+  <!-- Undertext -->
+  <text x="152" y="112" font-family="'Segoe UI', system-ui, sans-serif"
+        font-size="15" font-weight="600" letter-spacing="5" fill="#9a92b5">3D-PRINTADE PRYLAR</text>
+</svg>
