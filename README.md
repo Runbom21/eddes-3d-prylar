@@ -8,7 +8,7 @@ Dubbelklicka på `index.html` så öppnas sidan i webbläsaren.
 ## Ändra innehållet
 - **Butiksnamn:** ändras i `index.html` (sök efter "King of 3D").
 - **Produkter:** varje pryl är ett `<article class="card">`-block i `index.html`. Kopiera ett block för att lägga till fler.
-- **Mejladress:** byt `edde@example.com` i `index.html` till en riktig adress.
+- **Mejladress:** byt `lukas@example.com` i `index.html` till en riktig adress.
 - **Färger:** ändras högst upp i `styles.css` (raderna med `--rosa`, `--lila`).
 
 ## Filer
