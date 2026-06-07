@@ -161,6 +161,12 @@ body {
   font-size: 0.9rem;
 }
 
+.delivery-note {
+  margin-top: 1.25rem;
+  color: #7a5a8a;
+  font-size: 0.95rem;
+}
+
 /* ====== Fot ====== */
 .footer {
   text-align: center;
