@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- Byt titeln nedan till din sons butiksnamn -->
   <title>King of 3D</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -12,7 +13,22 @@
   <!-- ====== TOPP ====== -->
   <header class="hero">
     <nav class="nav">
-      <span class="logo">👑 King of 3D</span>
+      <svg class="logo" viewBox="0 0 380 72" role="img" aria-label="King of 3D">
+        <defs>
+          <linearGradient id="goldHdr" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ffe07a"/>
+            <stop offset="1" stop-color="#f5a623"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(2,7) scale(0.62)">
+          <path d="M15,74 L15,40 L33,56 L50,22 L67,56 L85,40 L85,74 Z"
+                fill="url(#goldHdr)" stroke="#ffe9b0" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="12" y="72" width="76" height="13" rx="5" fill="url(#goldHdr)"/>
+          <circle cx="50" cy="22" r="6" fill="#fff"/>
+        </g>
+        <text x="78" y="50" font-family="'Segoe UI', system-ui, sans-serif"
+              font-size="40" font-weight="800" fill="#fff" letter-spacing="-0.5">King of <tspan fill="url(#goldHdr)">3D</tspan></text>
+      </svg>
       <a class="nav-link" href="#produkter">Produkter</a>
       <a class="nav-link" href="#bestall">Beställ</a>
     </nav>
