@@ -254,6 +254,36 @@ body {
   border-radius: 12px;
   margin-bottom: 1rem;
 }
+
+/* Produktkort med riktigt foto */
+.card-img.photo {
+  padding: 0;
+  background: #fff;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  display: flex;
+}
+.card-img.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s ease;
+}
+.card:hover .card-img.photo img { transform: scale(1.07); }
+
+.new-badge {
+  position: absolute;
+  top: 12px; left: 12px;
+  background: linear-gradient(135deg, var(--guld-ljus), var(--guld));
+  color: #1a1407;
+  font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  z-index: 2;
+}
 .card h3 { font-size: 1.05rem; margin-bottom: 1rem; flex-grow: 1; color: var(--text); }
 
 .card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
