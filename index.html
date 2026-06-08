@@ -75,57 +75,91 @@
 
       <div class="grid">
 
-        <!-- VAS – produkt med riktigt foto. -->
+        <!-- Produktmall: kopiera ett block, byt data-name, data-price, data-category,
+             bilden (img src) och namnet i <h3>. Kategorier: leksaker, heminredning,
+             tillbehor, presenter, nyheter, paket (flera tillåts, separera med mellanslag). -->
+
         <article class="card" data-name="Vas" data-price="199" data-category="heminredning nyheter">
           <span class="new-badge">NYHET</span>
-          <div class="card-img photo">
-            <img src="images/vas.webp" alt="Blå spiralvas med torkade blommor" loading="lazy" />
-          </div>
+          <div class="card-img photo"><img src="images/vas.webp" alt="Blå spiralvas" loading="lazy" /></div>
           <h3>Vas</h3>
-          <div class="card-bottom">
-            <span class="price">199 kr</span>
-            <button class="add-btn">KÖP NU</button>
-          </div>
+          <div class="card-bottom"><span class="price">199 kr</span><button class="add-btn">KÖP NU</button></div>
         </article>
 
-        <!-- En produkt. Kopiera hela blocket för att lägga till fler.
-             Ändra data-name (namn) och data-price (pris i kr, bara siffror). -->
+        <article class="card" data-name="Cowboyhatt för katt" data-price="79" data-category="presenter nyheter">
+          <span class="new-badge">NYHET</span>
+          <div class="card-img photo"><img src="images/cowboyhatt-for-katt.webp" alt="Cowboyhatt för katt" loading="lazy" /></div>
+          <h3>Cowboyhatt för katt</h3>
+          <div class="card-bottom"><span class="price">79 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
         <article class="card" data-name="Ledad drake" data-price="79" data-category="leksaker">
-          <div class="card-img" aria-hidden="true">🐉</div>
+          <div class="card-img photo"><img src="images/drake.webp" alt="Ledad 3D-printad drake" loading="lazy" /></div>
           <h3>Ledad drake</h3>
-          <div class="card-bottom">
-            <span class="price">79 kr</span>
-            <button class="add-btn">KÖP NU</button>
-          </div>
+          <div class="card-bottom"><span class="price">79 kr</span><button class="add-btn">KÖP NU</button></div>
         </article>
 
-        <article class="card" data-name="Kruka" data-price="59" data-category="heminredning">
-          <div class="card-img" aria-hidden="true">🪴</div>
-          <h3>Geometrisk kruka</h3>
-          <div class="card-bottom">
-            <span class="price">59 kr</span>
-            <button class="add-btn">KÖP NU</button>
-          </div>
+        <article class="card" data-name="Fidget – 10 stjärnor" data-price="49" data-category="leksaker nyheter">
+          <span class="new-badge">NYHET</span>
+          <div class="card-img photo"><img src="images/10-stjarnig-fidgettoy.webp" alt="Tiostjärnig fidgetleksak" loading="lazy" /></div>
+          <h3>Fidget – 10 stjärnor</h3>
+          <div class="card-bottom"><span class="price">49 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Flow-Ball fidget" data-price="49" data-category="leksaker">
+          <div class="card-img photo"><img src="images/flow-ball-fidget.webp" alt="Flow-Ball fidgetleksak" loading="lazy" /></div>
+          <h3>Flow-Ball fidget</h3>
+          <div class="card-bottom"><span class="price">49 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Luftlös boll" data-price="69" data-category="leksaker">
+          <div class="card-img photo"><img src="images/luftlos-boll.webp" alt="Luftlös boll" loading="lazy" /></div>
+          <h3>Luftlös boll</h3>
+          <div class="card-bottom"><span class="price">69 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Hörlursställ" data-price="129" data-category="tillbehor">
+          <div class="card-img photo"><img src="images/horlursstall.webp" alt="Hörlursställ" loading="lazy" /></div>
+          <h3>Hörlursställ</h3>
+          <div class="card-bottom"><span class="price">129 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="PS5-kontrollhållare" data-price="99" data-category="tillbehor">
+          <div class="card-img photo"><img src="images/hallare-ps5-kontroll.webp" alt="Hållare för PS5-kontroll" loading="lazy" /></div>
+          <h3>PS5-kontrollhållare</h3>
+          <div class="card-bottom"><span class="price">99 kr</span><button class="add-btn">KÖP NU</button></div>
         </article>
 
         <!-- Exempel på en vara på REA (röd prislapp). -->
-        <article class="card" data-name="Nyckelring" data-price="29" data-category="presenter">
-          <span class="sale-badge">-25%</span>
-          <div class="card-img" aria-hidden="true">🔑</div>
-          <h3>Personlig nyckelring</h3>
-          <div class="card-bottom">
-            <span class="price"><s>39 kr</s> <strong class="sale-price">29 kr</strong></span>
-            <button class="add-btn">KÖP NU</button>
-          </div>
+        <article class="card" data-name="Laddkabelhållare" data-price="39" data-category="tillbehor">
+          <span class="sale-badge">-20%</span>
+          <div class="card-img photo"><img src="images/hallare-till-laddkabel.webp" alt="Hållare till laddkabel" loading="lazy" /></div>
+          <h3>Laddkabelhållare</h3>
+          <div class="card-bottom"><span class="price"><s>49 kr</s> <strong class="sale-price">39 kr</strong></span><button class="add-btn">KÖP NU</button></div>
         </article>
 
-        <article class="card" data-name="Mobilställ" data-price="69" data-category="tillbehor">
-          <div class="card-img" aria-hidden="true">🎮</div>
-          <h3>Mobilställ</h3>
-          <div class="card-bottom">
-            <span class="price">69 kr</span>
-            <button class="add-btn">KÖP NU</button>
-          </div>
+        <article class="card" data-name="Pappershållare" data-price="79" data-category="heminredning">
+          <div class="card-img photo"><img src="images/pappershallare.webp" alt="Pappershållare" loading="lazy" /></div>
+          <h3>Pappershållare</h3>
+          <div class="card-bottom"><span class="price">79 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Frukt- &amp; grönsakstvätt" data-price="89" data-category="heminredning">
+          <div class="card-img photo"><img src="images/frukt-gronsakstvatt.webp" alt="Frukt- och grönsakstvätt" loading="lazy" /></div>
+          <h3>Frukt- &amp; grönsakstvätt</h3>
+          <div class="card-bottom"><span class="price">89 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Diamantväv" data-price="59" data-category="heminredning">
+          <div class="card-img photo"><img src="images/diamantvav.webp" alt="Diamantväv" loading="lazy" /></div>
+          <h3>Diamantväv</h3>
+          <div class="card-bottom"><span class="price">59 kr</span><button class="add-btn">KÖP NU</button></div>
+        </article>
+
+        <article class="card" data-name="Ölhållare" data-price="59" data-category="presenter">
+          <div class="card-img photo"><img src="images/ol-hallare.webp" alt="Ölhållare" loading="lazy" /></div>
+          <h3>Ölhållare</h3>
+          <div class="card-bottom"><span class="price">59 kr</span><button class="add-btn">KÖP NU</button></div>
         </article>
 
       </div>

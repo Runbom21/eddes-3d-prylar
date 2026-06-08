@@ -266,8 +266,8 @@ body {
 /* Produktkort med riktigt foto */
 .card-img.photo {
   padding: 0;
-  background: #fff;
-  aspect-ratio: 4 / 3;
+  background: #0f0f13;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   display: flex;
 }
