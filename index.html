@@ -22,7 +22,7 @@
   <!-- ====== HUVUDHEADER ====== -->
   <header class="site-header">
     <div class="header-inner">
-      <img class="logo" src="logo.svg" alt="King of 3D" />
+      <img class="logo" src="images/logo.png" alt="King of 3D" />
 
       <form class="search" onsubmit="return false">
         <input type="text" id="searchInput" placeholder="Sök bland våra prylar…" aria-label="Sök produkter" />
@@ -40,19 +40,20 @@
 
     <!-- Kategori-meny -->
     <nav class="catnav">
-      <a href="#produkter">Leksaker</a>
-      <a href="#produkter">Heminredning</a>
-      <a href="#produkter">Tillbehör</a>
-      <a href="#produkter">Presenter</a>
-      <a href="#produkter">Nyheter</a>
-      <a href="#produkter">Paket</a>
+      <a href="#produkter" data-cat="alla" class="active">Alla</a>
+      <a href="#produkter" data-cat="leksaker">Leksaker</a>
+      <a href="#produkter" data-cat="heminredning">Heminredning</a>
+      <a href="#produkter" data-cat="tillbehor">Tillbehör</a>
+      <a href="#produkter" data-cat="presenter">Presenter</a>
+      <a href="#produkter" data-cat="nyheter">Nyheter</a>
+      <a href="#produkter" data-cat="paket">Paket</a>
     </nav>
   </header>
 
   <!-- ====== HERO ====== -->
   <section class="hero2">
     <div class="hero2-inner">
-      <img class="hero-logo" src="logo.svg" alt="King of 3D" />
+      <img class="hero-logo" src="images/logo.png" alt="King of 3D" />
       <h1>3D-printade prylar <span>– gjorda för hand</span></h1>
       <p>Roliga och praktiska saker i färgen du vill ha. Designade och utskrivna av Lukas.</p>
       <a class="btn btn-lg" href="#produkter">Handla nu</a>
@@ -75,7 +76,7 @@
       <div class="grid">
 
         <!-- VAS – produkt med riktigt foto. -->
-        <article class="card" data-name="Vas" data-price="199">
+        <article class="card" data-name="Vas" data-price="199" data-category="heminredning nyheter">
           <span class="new-badge">NYHET</span>
           <div class="card-img photo">
             <img src="images/vas.webp" alt="Blå spiralvas med torkade blommor" loading="lazy" />
@@ -89,7 +90,7 @@
 
         <!-- En produkt. Kopiera hela blocket för att lägga till fler.
              Ändra data-name (namn) och data-price (pris i kr, bara siffror). -->
-        <article class="card" data-name="Ledad drake" data-price="79">
+        <article class="card" data-name="Ledad drake" data-price="79" data-category="leksaker">
           <div class="card-img" aria-hidden="true">🐉</div>
           <h3>Ledad drake</h3>
           <div class="card-bottom">
@@ -98,7 +99,7 @@
           </div>
         </article>
 
-        <article class="card" data-name="Kruka" data-price="59">
+        <article class="card" data-name="Kruka" data-price="59" data-category="heminredning">
           <div class="card-img" aria-hidden="true">🪴</div>
           <h3>Geometrisk kruka</h3>
           <div class="card-bottom">
@@ -108,7 +109,7 @@
         </article>
 
         <!-- Exempel på en vara på REA (röd prislapp). -->
-        <article class="card" data-name="Nyckelring" data-price="29">
+        <article class="card" data-name="Nyckelring" data-price="29" data-category="presenter">
           <span class="sale-badge">-25%</span>
           <div class="card-img" aria-hidden="true">🔑</div>
           <h3>Personlig nyckelring</h3>
@@ -118,7 +119,7 @@
           </div>
         </article>
 
-        <article class="card" data-name="Mobilställ" data-price="69">
+        <article class="card" data-name="Mobilställ" data-price="69" data-category="tillbehor">
           <div class="card-img" aria-hidden="true">🎮</div>
           <h3>Mobilställ</h3>
           <div class="card-bottom">
@@ -128,6 +129,7 @@
         </article>
 
       </div>
+      <p class="no-products" hidden>Inga prylar i den här kategorin än 🙂</p>
     </section>
 
     <!-- ====== SÅ FUNKAR DET ====== -->
