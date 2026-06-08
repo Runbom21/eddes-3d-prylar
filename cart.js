@@ -139,15 +139,49 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("cartOverlay").addEventListener("click", closeCart);
   document.getElementById("checkoutBtn").addEventListener("click", checkout);
 
+  const catLinks = document.querySelectorAll(".catnav a");
+
+  // Visa hälsningen om en kategori råkar vara tom
+  function toggleNoProducts() {
+    const synliga = Array.from(document.querySelectorAll("#produkter .card"))
+      .some(function (c) { return c.style.display !== "none"; });
+    const msg = document.querySelector(".no-products");
+    if (msg) msg.hidden = synliga;
+  }
+
+  // Markera en kategori-länk som aktiv
+  function setActive(link) {
+    catLinks.forEach(function (l) { l.classList.remove("active"); });
+    if (link) link.classList.add("active");
+  }
+
+  // Kategori-menyn: filtrera prylarna
+  catLinks.forEach(function (link) {
+    link.addEventListener("click", function () {
+      const cat = link.dataset.cat;
+      setActive(link);
+      const searchEl = document.getElementById("searchInput");
+      if (searchEl) searchEl.value = "";
+      document.querySelectorAll("#produkter .card").forEach(function (card) {
+        const cats = (card.dataset.category || "").toLowerCase().split(" ");
+        const show = cat === "alla" || cats.indexOf(cat) !== -1;
+        card.style.display = show ? "" : "none";
+      });
+      toggleNoProducts();
+    });
+  });
+
   // Sökrutan: filtrera prylarna medan man skriver
   const searchInput = document.getElementById("searchInput");
   if (searchInput) {
     searchInput.addEventListener("input", function () {
       const q = this.value.toLowerCase().trim();
+      setActive(document.querySelector('.catnav a[data-cat="alla"]'));
       document.querySelectorAll("#produkter .card").forEach(function (card) {
         const namn = card.querySelector("h3").textContent.toLowerCase();
         card.style.display = namn.includes(q) ? "" : "none";
       });
+      toggleNoProducts();
     });
   }
 
