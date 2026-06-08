@@ -139,5 +139,17 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("cartOverlay").addEventListener("click", closeCart);
   document.getElementById("checkoutBtn").addEventListener("click", checkout);
 
+  // Sökrutan: filtrera prylarna medan man skriver
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", function () {
+      const q = this.value.toLowerCase().trim();
+      document.querySelectorAll("#produkter .card").forEach(function (card) {
+        const namn = card.querySelector("h3").textContent.toLowerCase();
+        card.style.display = namn.includes(q) ? "" : "none";
+      });
+    });
+  }
+
   renderCart();
 });
