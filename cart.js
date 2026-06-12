@@ -185,5 +185,34 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Lightbox: klicka på en produktbild för att se den stort
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+  const lightboxCaption = document.getElementById("lightboxCaption");
+
+  function openLightbox(src, namn) {
+    lightboxImg.src = src;
+    lightboxImg.alt = namn;
+    lightboxCaption.textContent = namn;
+    lightbox.classList.add("show");
+  }
+  function closeLightbox() {
+    lightbox.classList.remove("show");
+  }
+
+  document.querySelectorAll("#produkter .card .card-img.photo img").forEach(function (img) {
+    img.addEventListener("click", function () {
+      const card = img.closest(".card");
+      openLightbox(img.src, card ? card.dataset.name : "");
+    });
+  });
+  document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", function (e) {
+    if (e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeLightbox();
+  });
+
   renderCart();
 });
