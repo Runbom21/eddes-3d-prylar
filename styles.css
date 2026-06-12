@@ -483,13 +483,22 @@ body {
   cursor: pointer;
 }
 
-/* När admin-läget är på blir priser klickbara */
-body.admin-on .price {
+/* Admin-knappar på varje produktkort (syns bara i admin-läge) */
+.admin-controls { display: none; gap: 0.4rem; margin-top: 0.7rem; }
+body.admin-on .admin-controls { display: flex; }
+.adm-btn {
+  flex: 1;
+  background: #1f1f26;
+  border: 1px solid var(--guld);
+  color: var(--guld-ljus);
+  border-radius: 8px;
+  padding: 0.4rem 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
   cursor: pointer;
-  outline: 2px dashed var(--guld);
-  outline-offset: 3px;
-  border-radius: 6px;
 }
+.adm-btn:hover { background: #2a2a33; }
+.adm-btn.active { background: var(--guld); color: #1a1407; }
 
 /* ====== Mobil ====== */
 @media (max-width: 640px) {
