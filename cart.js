@@ -1,7 +1,7 @@
 // ===== King of 3D – varukorg =====
 // Enkel varukorg som sparas i webbläsaren (localStorage).
 // Byt mejladressen nedan till Lukas riktiga adress:
-const BESTALLNINGS_MEJL = "lukas@example.com";
+const BESTALLNINGS_MEJL = "lukas.b.runbom@gmail.com";
 
 // Hämta sparad varukorg (eller en tom)
 let cart = JSON.parse(localStorage.getItem("kingof3d_cart") || "{}");
