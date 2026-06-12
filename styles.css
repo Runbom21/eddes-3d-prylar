@@ -446,6 +446,51 @@ body {
   cursor: pointer;
 }
 
+/* ====== Admin-läge (bara för Björn) ====== */
+.admin-link {
+  margin-top: 1rem;
+  background: none;
+  border: 1px solid #2a2a33;
+  color: #6f6b80;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.admin-link:hover { color: var(--guld-ljus); border-color: var(--guld); }
+
+.admin-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 70;
+  background: var(--guld);
+  color: #1a1407;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+}
+.admin-bar button {
+  background: #1a1407;
+  color: var(--guld-ljus);
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* När admin-läget är på blir priser klickbara */
+body.admin-on .price {
+  cursor: pointer;
+  outline: 2px dashed var(--guld);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
 /* ====== Mobil ====== */
 @media (max-width: 640px) {
   .header-inner { flex-wrap: wrap; }
