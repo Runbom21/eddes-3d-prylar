@@ -355,6 +355,9 @@ body {
   color: var(--gra);
   font-size: 0.9rem;
 }
+.footer p { margin: 0.3rem 0; }
+.footer-tiktok { color: var(--guld-ljus); text-decoration: none; font-weight: 700; }
+.footer-tiktok:hover { text-decoration: underline; }
 
 /* ====== Varukorgspanel ====== */
 .cart-overlay {
