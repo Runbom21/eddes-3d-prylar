@@ -30,7 +30,7 @@
       </form>
 
       <div class="header-icons">
-        <a class="icon-btn" href="#sa-funkar-det" aria-label="Kundtjänst">👤</a>
+        <button class="icon-btn" id="adminLink" aria-label="Logga in">👤</button>
         <button class="cart-btn" id="cartBtn" aria-label="Öppna varukorgen">
           🛒
           <span class="cart-count" id="cartCount">0</span>
@@ -144,12 +144,11 @@
   <!-- ====== FOT ====== -->
   <footer class="footer">
     <p>Gjord med ❤️ av Lukas · King of 3D · 3D-printade prylar</p>
-    <button class="admin-link" id="adminLink">🔒 Admin</button>
   </footer>
 
-  <!-- Admin-läge: bara för Björn (prisredigering) -->
+  <!-- Inloggat läge: bara för Björn (prisredigering) -->
   <div class="admin-bar" id="adminBar" hidden>
-    <span>🔧 Admin-läge på – klicka på ett pris för att ändra det.</span>
+    <span>🔓 Inloggad – klicka på ett pris för att ändra det.</span>
     <button id="adminLogout">Logga ut</button>
   </div>
 
