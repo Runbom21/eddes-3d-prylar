@@ -338,7 +338,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const states = {};
   document.querySelectorAll("#produkter .card").forEach(function (card) {
     const namn = card.dataset.name;
-    states[namn] = Object.assign(startState(card), adminMap[namn] || {});
+    // Koden (det publicerade priset) är alltid sanningen som visas.
+    // Inloggat läge kan förhandsvisa ändringar, men de sparas inte över omladdning.
+    states[namn] = startState(card);
     renderCard(card, states[namn]);
     injectControls(card);
   });
