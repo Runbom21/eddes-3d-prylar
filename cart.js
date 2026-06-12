@@ -214,5 +214,62 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "Escape") closeLightbox();
   });
 
+  // ===== Admin-läge: bara Björn kan ändra priser =====
+  // Byt lösenordet här om du vill (eller säg till mig):
+  const ADMIN_LOSEN = "King3D";
+  const PRIS_NYCKEL = "kingof3d_priser";
+
+  function laddaSparadePriser() {
+    return JSON.parse(localStorage.getItem(PRIS_NYCKEL) || "{}");
+  }
+  function prisElement(card) {
+    return card.querySelector(".sale-price") || card.querySelector(".price");
+  }
+  // Återställ tidigare sparade priser (på den här datorn)
+  (function applySavedPrices() {
+    const sparade = laddaSparadePriser();
+    document.querySelectorAll("#produkter .card").forEach(function (card) {
+      const namn = card.dataset.name;
+      if (sparade[namn] != null) {
+        card.dataset.price = sparade[namn];
+        prisElement(card).textContent = sparade[namn] + " kr";
+      }
+    });
+  })();
+
+  let adminPa = false;
+  function setAdmin(on) {
+    adminPa = on;
+    document.getElementById("adminBar").hidden = !on;
+    document.body.classList.toggle("admin-on", on);
+  }
+
+  document.getElementById("adminLink").addEventListener("click", function () {
+    if (adminPa) { setAdmin(false); return; }
+    const svar = prompt("Ange admin-lösenord:");
+    if (svar === ADMIN_LOSEN) setAdmin(true);
+    else if (svar !== null) alert("Fel lösenord.");
+  });
+  document.getElementById("adminLogout").addEventListener("click", function () {
+    setAdmin(false);
+  });
+
+  // Klick på ett pris i admin-läge → ändra det
+  document.querySelectorAll("#produkter .card .price").forEach(function (priceSpan) {
+    priceSpan.addEventListener("click", function () {
+      if (!adminPa) return;
+      const card = priceSpan.closest(".card");
+      const nytt = prompt('Nytt pris för "' + card.dataset.name + '" (kr):', card.dataset.price);
+      if (nytt === null) return;
+      const n = parseInt(nytt, 10);
+      if (isNaN(n) || n < 0) { alert("Skriv ett giltigt pris (bara siffror)."); return; }
+      card.dataset.price = n;
+      prisElement(card).textContent = n + " kr";
+      const sparade = laddaSparadePriser();
+      sparade[card.dataset.name] = n;
+      localStorage.setItem(PRIS_NYCKEL, JSON.stringify(sparade));
+    });
+  });
+
   renderCart();
 });
