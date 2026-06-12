@@ -214,28 +214,118 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "Escape") closeLightbox();
   });
 
-  // ===== Admin-läge: bara Björn kan ändra priser =====
-  // Byt lösenordet här om du vill (eller säg till mig):
-  const ADMIN_LOSEN = "King3D";
-  const PRIS_NYCKEL = "kingof3d_priser";
+  // ===== Admin-läge: bara Björn kan ändra pris, nyhet och rea =====
+  const ADMIN_LOSEN = "King3D";          // byt gärna – säg till mig
+  const ADMIN_NYCKEL = "kingof3d_admin";
 
-  function laddaSparadePriser() {
-    return JSON.parse(localStorage.getItem(PRIS_NYCKEL) || "{}");
+  function laddaAdmin() { return JSON.parse(localStorage.getItem(ADMIN_NYCKEL) || "{}"); }
+  function sparaAdmin() { localStorage.setItem(ADMIN_NYCKEL, JSON.stringify(adminMap)); }
+
+  // Läs ursprungligt läge (pris, ev. rea, ev. nyhet) från HTML
+  function startState(card) {
+    const struket = card.querySelector(".price s");
+    return {
+      pris: parseInt(card.dataset.price, 10),
+      ordPris: struket ? parseInt(struket.textContent, 10) : null,
+      nyhet: !!card.querySelector(".new-badge")
+    };
   }
-  function prisElement(card) {
-    return card.querySelector(".sale-price") || card.querySelector(".price");
+
+  function renderCard(card, s) {
+    card.dataset.price = s.pris;
+    // håll kategorin "nyheter" i synk med nyhet-flaggan
+    let cats = (card.dataset.category || "").split(" ").filter(function (c) { return c && c !== "nyheter"; });
+    if (s.nyhet) cats.push("nyheter");
+    card.dataset.category = cats.join(" ");
+    // rensa gamla brickor
+    const oN = card.querySelector(".new-badge"); if (oN) oN.remove();
+    const oS = card.querySelector(".sale-badge"); if (oS) oS.remove();
+    if (s.nyhet) {
+      const b = document.createElement("span");
+      b.className = "new-badge"; b.textContent = "NYHET";
+      card.insertBefore(b, card.firstChild);
+    }
+    const priceEl = card.querySelector(".price");
+    if (s.ordPris && s.ordPris > s.pris) {
+      const proc = Math.round((s.ordPris - s.pris) / s.ordPris * 100);
+      const sb = document.createElement("span");
+      sb.className = "sale-badge"; sb.textContent = "-" + proc + "%";
+      card.insertBefore(sb, card.firstChild);
+      priceEl.innerHTML = '<s>' + s.ordPris + ' kr</s> <strong class="sale-price">' + s.pris + ' kr</strong>';
+    } else {
+      priceEl.textContent = s.pris + " kr";
+    }
   }
-  // Återställ tidigare sparade priser (på den här datorn)
-  (function applySavedPrices() {
-    const sparade = laddaSparadePriser();
-    document.querySelectorAll("#produkter .card").forEach(function (card) {
-      const namn = card.dataset.name;
-      if (sparade[namn] != null) {
-        card.dataset.price = sparade[namn];
-        prisElement(card).textContent = sparade[namn] + " kr";
-      }
+
+  function uppdateraKnappar(card) {
+    const s = states[card.dataset.name];
+    const nB = card.querySelector(".adm-nyhet");
+    const rB = card.querySelector(".adm-rea");
+    if (nB) nB.classList.toggle("active", !!s.nyhet);
+    if (rB) rB.classList.toggle("active", !!(s.ordPris && s.ordPris > s.pris));
+  }
+
+  function spara(card) {
+    adminMap[card.dataset.name] = states[card.dataset.name];
+    sparaAdmin();
+    renderCard(card, states[card.dataset.name]);
+    uppdateraKnappar(card);
+  }
+
+  function injectControls(card) {
+    const namn = card.dataset.name;
+    const wrap = document.createElement("div");
+    wrap.className = "admin-controls";
+    wrap.innerHTML =
+      '<button class="adm-btn adm-pris">✏️ Pris</button>' +
+      '<button class="adm-btn adm-nyhet">⭐ Nyhet</button>' +
+      '<button class="adm-btn adm-rea">🏷️ REA</button>';
+    card.appendChild(wrap);
+
+    wrap.querySelector(".adm-pris").addEventListener("click", function () {
+      const v = prompt('Pris för "' + namn + '" (kr):', states[namn].pris);
+      if (v === null) return;
+      const n = parseInt(v, 10);
+      if (isNaN(n) || n < 0) { alert("Skriv bara siffror."); return; }
+      states[namn].pris = n; spara(card);
     });
-  })();
+
+    wrap.querySelector(".adm-nyhet").addEventListener("click", function () {
+      states[namn].nyhet = !states[namn].nyhet; spara(card);
+    });
+
+    wrap.querySelector(".adm-rea").addEventListener("click", function () {
+      const s = states[namn];
+      if (s.ordPris && s.ordPris > s.pris) {
+        const r = prompt('Reapris för "' + namn + '" (kr). Lämna tomt för att ta bort rean:', s.pris);
+        if (r === null) return;
+        if (r.trim() === "") { s.ordPris = null; }
+        else { const n = parseInt(r, 10); if (isNaN(n) || n < 0) { alert("Bara siffror."); return; } s.pris = n; }
+      } else {
+        const o = prompt('Ordinarie pris (det överstrukna) för "' + namn + '":', s.pris);
+        if (o === null) return;
+        const ord = parseInt(o, 10); if (isNaN(ord) || ord < 0) { alert("Bara siffror."); return; }
+        const r = prompt('Reapris (det nya, lägre priset):', "");
+        if (r === null) return;
+        const sale = parseInt(r, 10); if (isNaN(sale) || sale < 0) { alert("Bara siffror."); return; }
+        if (sale >= ord) { alert("Reapriset måste vara lägre än ordinarie."); return; }
+        s.ordPris = ord; s.pris = sale;
+      }
+      spara(card);
+    });
+
+    uppdateraKnappar(card);
+  }
+
+  // Initiera alla kort
+  const adminMap = laddaAdmin();
+  const states = {};
+  document.querySelectorAll("#produkter .card").forEach(function (card) {
+    const namn = card.dataset.name;
+    states[namn] = Object.assign(startState(card), adminMap[namn] || {});
+    renderCard(card, states[namn]);
+    injectControls(card);
+  });
 
   let adminPa = false;
   function setAdmin(on) {
@@ -243,33 +333,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("adminBar").hidden = !on;
     document.body.classList.toggle("admin-on", on);
   }
-
   document.getElementById("adminLink").addEventListener("click", function () {
     if (adminPa) { setAdmin(false); return; }
     const svar = prompt("Ange admin-lösenord:");
     if (svar === ADMIN_LOSEN) setAdmin(true);
     else if (svar !== null) alert("Fel lösenord.");
   });
-  document.getElementById("adminLogout").addEventListener("click", function () {
-    setAdmin(false);
-  });
-
-  // Klick på ett pris i admin-läge → ändra det
-  document.querySelectorAll("#produkter .card .price").forEach(function (priceSpan) {
-    priceSpan.addEventListener("click", function () {
-      if (!adminPa) return;
-      const card = priceSpan.closest(".card");
-      const nytt = prompt('Nytt pris för "' + card.dataset.name + '" (kr):', card.dataset.price);
-      if (nytt === null) return;
-      const n = parseInt(nytt, 10);
-      if (isNaN(n) || n < 0) { alert("Skriv ett giltigt pris (bara siffror)."); return; }
-      card.dataset.price = n;
-      prisElement(card).textContent = n + " kr";
-      const sparade = laddaSparadePriser();
-      sparade[card.dataset.name] = n;
-      localStorage.setItem(PRIS_NYCKEL, JSON.stringify(sparade));
-    });
-  });
+  document.getElementById("adminLogout").addEventListener("click", function () { setAdmin(false); });
 
   renderCart();
 });
