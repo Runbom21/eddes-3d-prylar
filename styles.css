@@ -335,6 +335,16 @@ body {
 .step p { color: var(--gra); font-size: 0.95rem; }
 .step strong { color: var(--text); }
 
+/* ====== Kontakt ====== */
+.kontakt {
+  text-align: center;
+  font-size: 1.1rem;
+}
+.kontakt p { margin: 0.4rem 0; color: var(--text); }
+.kontakt-namn { font-weight: 800; font-size: 1.25rem; color: var(--silver); }
+.kontakt a { color: var(--guld-ljus); text-decoration: none; }
+.kontakt a:hover { text-decoration: underline; }
+
 /* ====== Fot ====== */
 .footer {
   text-align: center;
