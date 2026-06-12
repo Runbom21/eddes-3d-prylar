@@ -332,6 +332,11 @@ document.addEventListener("DOMContentLoaded", function () {
     adminPa = on;
     document.getElementById("adminBar").hidden = !on;
     document.body.classList.toggle("admin-on", on);
+    const lnk = document.getElementById("adminLink");
+    lnk.classList.toggle("active", on);
+    lnk.textContent = on ? "🔓" : "👤";
+    lnk.setAttribute("aria-label", on ? "Logga ut" : "Logga in");
+    lnk.title = on ? "Logga ut" : "Logga in";
   }
   document.getElementById("adminLink").addEventListener("click", function () {
     if (adminPa) { setAdmin(false); return; }
