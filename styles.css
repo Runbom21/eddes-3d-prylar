@@ -416,6 +416,8 @@ body {
 .cart-total-row { display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; }
 .checkout-btn { width: 100%; border: none; cursor: pointer; text-align: center; font-weight: 800; }
 .cart-note { font-size: 0.8rem; color: var(--gra); margin-top: 0.85rem; text-align: center; }
+.cart-shipping { text-align: center; font-size: 0.85rem; font-weight: 700; margin: 0 0 0.85rem; color: var(--guld-ljus); }
+.cart-shipping.gratis { color: #5fcf80; }
 
 /* ====== Stor bild (lightbox) ====== */
 .lightbox {
