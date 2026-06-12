@@ -270,6 +270,7 @@ body {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   display: flex;
+  cursor: zoom-in;
 }
 .card-img.photo img {
   width: 100%;
@@ -401,6 +402,49 @@ body {
 .cart-total-row { display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; margin-bottom: 1rem; }
 .checkout-btn { width: 100%; border: none; cursor: pointer; text-align: center; font-weight: 800; }
 .cart-note { font-size: 0.8rem; color: var(--gra); margin-top: 0.85rem; text-align: center; }
+
+/* ====== Stor bild (lightbox) ====== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+  z-index: 60;
+  cursor: zoom-out;
+}
+.lightbox.show { opacity: 1; visibility: visible; }
+
+.lightbox-content { max-width: 92vw; max-height: 92vh; text-align: center; }
+.lightbox-content img {
+  max-width: 92vw;
+  max-height: 80vh;
+  border-radius: 16px;
+  border: 1px solid #2a2a33;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+}
+.lightbox-content figcaption {
+  color: var(--guld-ljus);
+  margin-top: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+.lightbox-close {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.6rem;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
 
 /* ====== Mobil ====== */
 @media (max-width: 640px) {
