@@ -78,7 +78,22 @@ function renderCart() {
       .join("");
   }
 
-  document.getElementById("cartTotal").textContent = cartTotal() + " kr";
+  const total = cartTotal();
+  document.getElementById("cartTotal").textContent = total + " kr";
+
+  // Fraktinfo: fri frakt över 300 kr, annars tillkommer frakt
+  const ship = document.getElementById("cartShipping");
+  if (ship) {
+    if (total === 0) {
+      ship.textContent = "";
+    } else if (total >= 300) {
+      ship.textContent = "🎉 Du har fri frakt!";
+      ship.classList.add("gratis");
+    } else {
+      ship.textContent = "📦 Frakt tillkommer – handla för " + (300 - total) + " kr till för fri frakt!";
+      ship.classList.remove("gratis");
+    }
+  }
 }
 
 // Öppna / stäng panelen
@@ -103,7 +118,8 @@ function checkout() {
     const item = cart[name];
     text += "- " + item.qty + " x " + name + " (" + item.price + " kr/st)\n";
   });
-  text += "\nTotalt: " + cartTotal() + " kr\n\n";
+  text += "\nTotalt: " + cartTotal() + " kr\n";
+  text += (cartTotal() >= 300 ? "Frakt: Fri frakt\n\n" : "Frakt: Tillkommer (beställning under 300 kr)\n\n");
   text += "Önskade färger: \n";
   text += "Mitt namn: \n";
   text += "Leveransadress: \n";
