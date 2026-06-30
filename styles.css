@@ -419,6 +419,22 @@ body {
 .cart-shipping { text-align: center; font-size: 0.85rem; font-weight: 700; margin: 0 0 0.85rem; color: var(--guld-ljus); }
 .cart-shipping.gratis { color: #5fcf80; }
 
+.cart-form { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.85rem; }
+.cart-form input, .cart-form textarea {
+  background: var(--svart3);
+  border: 1px solid #34343f;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+.cart-form input::placeholder, .cart-form textarea::placeholder { color: #7c7890; }
+.cart-status { font-size: 0.85rem; text-align: center; margin-top: 0.6rem; }
+.cart-status.ok { color: #5fcf80; font-weight: 700; }
+.cart-status.fel { color: var(--rea); font-weight: 700; }
+
 /* ====== Stor bild (lightbox) ====== */
 .lightbox {
   position: fixed;

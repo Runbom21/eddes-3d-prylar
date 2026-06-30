@@ -106,29 +106,71 @@ function closeCart() {
   document.getElementById("cartOverlay").classList.remove("show");
 }
 
-// Skicka beställning via ett färdigt mejl
+// Skicka beställning – skickas direkt till butikens inkorg via FormSubmit
 function checkout() {
   const names = Object.keys(cart);
+  const status = document.getElementById("cartStatus");
   if (names.length === 0) {
     alert("Din varukorg är tom – lägg till något först!");
     return;
   }
-  let text = "Hej Lukas! Jag vill beställa:\n\n";
+
+  const namn = (document.getElementById("kundNamn").value || "").trim();
+  const kontakt = (document.getElementById("kundKontakt").value || "").trim();
+  const adress = (document.getElementById("kundAdress").value || "").trim();
+  const meddelande = (document.getElementById("kundMeddelande").value || "").trim();
+
+  if (!namn || !kontakt) {
+    status.className = "cart-status fel";
+    status.textContent = "Fyll i ditt namn och en kontaktuppgift först.";
+    return;
+  }
+
+  let orderLines = "";
   names.forEach(function (name) {
     const item = cart[name];
-    text += "- " + item.qty + " x " + name + " (" + item.price + " kr/st)\n";
+    orderLines += item.qty + " x " + name + " (" + item.price + " kr/st)\n";
   });
-  text += "\nTotalt: " + cartTotal() + " kr\n";
-  text += (cartTotal() >= 300 ? "Frakt: Fri frakt\n\n" : "Frakt: Tillkommer (beställning under 300 kr)\n\n");
-  text += "Önskade färger: \n";
-  text += "Mitt namn: \n";
-  text += "Leveransadress: \n";
+  const frakt = cartTotal() >= 300 ? "Fri frakt" : "Frakt tillkommer (beställning under 300 kr)";
 
-  const lank =
-    "mailto:" + BESTALLNINGS_MEJL +
-    "?subject=" + encodeURIComponent("Beställning från King of 3D") +
-    "&body=" + encodeURIComponent(text);
-  window.location.href = lank;
+  const btn = document.getElementById("checkoutBtn");
+  btn.disabled = true;
+  status.className = "cart-status";
+  status.textContent = "Skickar din beställning…";
+
+  fetch("https://formsubmit.co/ajax/" + BESTALLNINGS_MEJL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      _subject: "Ny beställning – King of 3D",
+      _template: "table",
+      _captcha: "false",
+      Namn: namn,
+      Kontakt: kontakt,
+      Leveransadress: adress || "-",
+      "Önskemål / meddelande": meddelande || "-",
+      Beställning: orderLines,
+      Totalt: cartTotal() + " kr",
+      Frakt: frakt,
+    }),
+  })
+    .then(function (r) { return r.json(); })
+    .then(function () {
+      cart = {};
+      saveCart();
+      renderCart();
+      ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande"].forEach(function (id) {
+        document.getElementById(id).value = "";
+      });
+      status.className = "cart-status ok";
+      status.textContent = "✅ Tack! Din beställning är skickad – vi hör av oss snart.";
+      btn.disabled = false;
+    })
+    .catch(function () {
+      status.className = "cart-status fel";
+      status.textContent = "Kunde inte skicka just nu. Försök igen, eller mejla oss på " + BESTALLNINGS_MEJL + ".";
+      btn.disabled = false;
+    });
 }
 
 // ===== Koppla ihop knappar när sidan laddat =====
