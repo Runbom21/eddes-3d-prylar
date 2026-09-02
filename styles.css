@@ -431,6 +431,18 @@ body {
   resize: vertical;
 }
 .cart-form input::placeholder, .cart-form textarea::placeholder { color: #7c7890; }
+
+/* Honeypot-fält för spamskydd – osynligt och otillgängligt för människor,
+   men lämnas kvar i DOM/tabb-flödet så enkla bottar hittar och fyller i det.
+   Medvetet inte display:none/visibility:hidden – vissa bottar filtrerar bort sådana fält. */
+.hp-field {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 .cart-status { font-size: 0.85rem; text-align: center; margin-top: 0.6rem; }
 .cart-status.ok { color: #5fcf80; font-weight: 700; }
 .cart-status.fel { color: var(--rea); font-weight: 700; }

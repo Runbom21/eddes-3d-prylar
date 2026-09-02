@@ -106,6 +106,19 @@ function closeCart() {
   document.getElementById("cartOverlay").classList.remove("show");
 }
 
+// Kolla att kontaktuppgiften ser ut som en e-postadress eller ett rimligt telefonnummer
+function arKontaktGiltig(varde) {
+  const v = (varde || "").trim();
+  const epostRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (epostRegex.test(v)) return true;
+
+  // Telefonnummer: tillåt siffror, mellanslag, bindestreck och parenteser,
+  // med valfritt inledande "+" (t.ex. 070-1234567 eller +46701234567).
+  const siffror = v.replace(/[\s\-()]/g, "");
+  const telefonRegex = /^\+?\d{7,15}$/;
+  return telefonRegex.test(siffror);
+}
+
 // Skicka beställning – skickas direkt till butikens inkorg via FormSubmit
 function checkout() {
   const names = Object.keys(cart);
@@ -119,10 +132,33 @@ function checkout() {
   const kontakt = (document.getElementById("kundKontakt").value || "").trim();
   const adress = (document.getElementById("kundAdress").value || "").trim();
   const meddelande = (document.getElementById("kundMeddelande").value || "").trim();
+  const honeypotFalt = document.getElementById("kundWebbplats");
+  const honeypot = (honeypotFalt ? honeypotFalt.value : "").trim();
+
+  // Honeypot ifylld = nästan säkert en bot. Låtsas att allt gick bra men
+  // skicka aldrig något till FormSubmit, så botten inte lär sig att den avslöjades.
+  if (honeypot) {
+    cart = {};
+    saveCart();
+    renderCart();
+    ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+    status.className = "cart-status ok";
+    status.textContent = "✅ Tack! Din beställning är skickad – vi hör av oss snart.";
+    return;
+  }
 
   if (!namn || !kontakt) {
     status.className = "cart-status fel";
     status.textContent = "Fyll i ditt namn och en kontaktuppgift först.";
+    return;
+  }
+
+  if (!arKontaktGiltig(kontakt)) {
+    status.className = "cart-status fel";
+    status.textContent = "Ange en giltig e-postadress eller ett telefonnummer (t.ex. 070-1234567 eller +46701234567).";
     return;
   }
 
@@ -144,7 +180,13 @@ function checkout() {
     body: JSON.stringify({
       _subject: "Ny beställning – King of 3D",
       _template: "table",
+      // FormSubmits inbyggda reCAPTCHA visas som en mellansida vid vanlig
+      // formulär-navigering och fungerar inte över AJAX-anropet (ingen sida
+      // att visa utmaningen på) – därför är den avstängd här. Det faktiska
+      // bot-skyddet för AJAX-flödet är honeypot-fältet nedan (_honey), som
+      // FormSubmit kollar server-side oavsett _captcha-läge.
       _captcha: "false",
+      _honey: honeypot,
       Namn: namn,
       Kontakt: kontakt,
       Leveransadress: adress || "-",
@@ -159,8 +201,9 @@ function checkout() {
       cart = {};
       saveCart();
       renderCart();
-      ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande"].forEach(function (id) {
-        document.getElementById(id).value = "";
+      ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
       });
       status.className = "cart-status ok";
       status.textContent = "✅ Tack! Din beställning är skickad – vi hör av oss snart.";
