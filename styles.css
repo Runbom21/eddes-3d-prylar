@@ -447,6 +447,10 @@ body {
 .cart-status.ok { color: #5fcf80; font-weight: 700; }
 .cart-status.fel { color: var(--rea); font-weight: 700; }
 
+/* Permanent varningstext ovanför "Skicka beställning" – ska synas innan kunden
+   skickar, inte bara vid fel. Ren psykologisk spärr mot missbruk. */
+.cart-warning { font-size: 0.75rem; color: var(--rea); text-align: center; margin: 0.6rem 0 0; opacity: 0.85; }
+
 /* ====== Stor bild (lightbox) ====== */
 .lightbox {
   position: fixed;

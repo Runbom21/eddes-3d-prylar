@@ -210,7 +210,7 @@
       <p class="cart-shipping" id="cartShipping"></p>
       <div class="cart-form" id="cartForm">
         <input type="text" id="kundNamn" placeholder="Ditt namn *" />
-        <input type="text" id="kundKontakt" placeholder="E-post eller telefon *" />
+        <input type="tel" id="kundTelefon" placeholder="Telefonnummer *" />
         <input type="text" id="kundAdress" placeholder="Leveransadress" />
         <textarea id="kundMeddelande" rows="2" placeholder="Önskade färger / meddelande"></textarea>
         <!-- Honeypot – osynligt för människor, lockbete för spam-bottar. Lämna alltid tomt. -->
@@ -219,6 +219,7 @@
           <input type="text" id="kundWebbplats" name="kundWebbplats" tabindex="-1" autocomplete="off" />
         </div>
       </div>
+      <p class="cart-warning">⚠️ Missbruk av beställningsfunktionen loggas och kan polisanmälas.</p>
       <button class="btn checkout-btn" id="checkoutBtn">Skicka beställning</button>
       <p class="cart-status" id="cartStatus"></p>
       <p class="cart-note">Du betalar med Swish till 076-396 97 51 när jag bekräftat din beställning. Inga pengar dras här på sidan.</p>

@@ -106,17 +106,28 @@ function closeCart() {
   document.getElementById("cartOverlay").classList.remove("show");
 }
 
-// Kolla att kontaktuppgiften ser ut som en e-postadress eller ett rimligt telefonnummer
-function arKontaktGiltig(varde) {
+// Kolla att telefonnumret ser rimligt ut
+function arTelefonGiltig(varde) {
   const v = (varde || "").trim();
-  const epostRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (epostRegex.test(v)) return true;
 
   // Telefonnummer: tillåt siffror, mellanslag, bindestreck och parenteser,
   // med valfritt inledande "+" (t.ex. 070-1234567 eller +46701234567).
   const siffror = v.replace(/[\s\-()]/g, "");
   const telefonRegex = /^\+?\d{7,15}$/;
   return telefonRegex.test(siffror);
+}
+
+// Spärr: max en beställning per enhet per dag (svag spärr, men stoppar lat
+// upprepad pranking – kringgås trivialt av den som rensar cache/inkognito).
+const SENASTE_BESTALLNING_NYCKEL = "kingof3d_last_order_date";
+function idagsDatum() {
+  return new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+}
+function harRedanBestalltIdag() {
+  return localStorage.getItem(SENASTE_BESTALLNING_NYCKEL) === idagsDatum();
+}
+function markeraBestalldIdag() {
+  localStorage.setItem(SENASTE_BESTALLNING_NYCKEL, idagsDatum());
 }
 
 // Skicka beställning – skickas direkt till butikens inkorg via FormSubmit
@@ -129,7 +140,7 @@ function checkout() {
   }
 
   const namn = (document.getElementById("kundNamn").value || "").trim();
-  const kontakt = (document.getElementById("kundKontakt").value || "").trim();
+  const telefon = (document.getElementById("kundTelefon").value || "").trim();
   const adress = (document.getElementById("kundAdress").value || "").trim();
   const meddelande = (document.getElementById("kundMeddelande").value || "").trim();
   const honeypotFalt = document.getElementById("kundWebbplats");
@@ -141,7 +152,7 @@ function checkout() {
     cart = {};
     saveCart();
     renderCart();
-    ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+    ["kundNamn", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
@@ -150,15 +161,21 @@ function checkout() {
     return;
   }
 
-  if (!namn || !kontakt) {
+  if (!namn || !telefon) {
     status.className = "cart-status fel";
-    status.textContent = "Fyll i ditt namn och en kontaktuppgift först.";
+    status.textContent = "Fyll i ditt namn och ditt telefonnummer först.";
     return;
   }
 
-  if (!arKontaktGiltig(kontakt)) {
+  if (!arTelefonGiltig(telefon)) {
     status.className = "cart-status fel";
-    status.textContent = "Ange en giltig e-postadress eller ett telefonnummer (t.ex. 070-1234567 eller +46701234567).";
+    status.textContent = "Ange ett giltigt telefonnummer (t.ex. 070-1234567 eller +46701234567).";
+    return;
+  }
+
+  if (harRedanBestalltIdag()) {
+    status.className = "cart-status fel";
+    status.textContent = "Du har redan lagt en beställning idag från den här enheten. Hör av dig direkt till oss om du behöver lägga en till.";
     return;
   }
 
@@ -188,7 +205,7 @@ function checkout() {
       _captcha: "false",
       _honey: honeypot,
       Namn: namn,
-      Kontakt: kontakt,
+      Telefon: telefon,
       Leveransadress: adress || "-",
       "Önskemål / meddelande": meddelande || "-",
       Beställning: orderLines,
@@ -198,10 +215,11 @@ function checkout() {
   })
     .then(function (r) { return r.json(); })
     .then(function () {
+      markeraBestalldIdag();
       cart = {};
       saveCart();
       renderCart();
-      ["kundNamn", "kundKontakt", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+      ["kundNamn", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
