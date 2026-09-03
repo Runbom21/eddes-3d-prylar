@@ -117,11 +117,11 @@ function arEpostGiltig(varde) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
 }
 
-// Kolla att telefonnumret är ett realistiskt svenskt mobilnummer (valfritt fält –
-// tomt är alltid OK, det obligatoriska kravet ligger numera på e-posten ovan).
+// Kolla att telefonnumret är ett realistiskt svenskt mobilnummer (obligatoriskt
+// fält – ett tomt värde ska INTE räknas som giltigt, det stoppas av
+// tomt-fält-checken i checkout() innan denna funktion ens anropas).
 function arTelefonGiltig(varde) {
   const v = (varde || "").trim();
-  if (!v) return true;
 
   // Ta bort mellanslag, bindestreck och parenteser (t.ex. 070-1234567 eller +46701234567).
   const siffror = v.replace(/[\s\-()]/g, "");
@@ -206,9 +206,9 @@ function checkout() {
     return;
   }
 
-  if (!namn || !epost) {
+  if (!namn || !epost || !telefon) {
     status.className = "cart-status fel";
-    status.textContent = "Fyll i ditt namn och din e-postadress först.";
+    status.textContent = "Fyll i ditt namn, e-postadress och telefonnummer först.";
     return;
   }
 
@@ -226,7 +226,7 @@ function checkout() {
 
   if (!arTelefonGiltig(telefon)) {
     status.className = "cart-status fel";
-    status.textContent = "Ange ett giltigt svenskt mobilnummer, t.ex. 070-1234567 eller +46701234567 – eller lämna fältet tomt.";
+    status.textContent = "Ange ett giltigt svenskt mobilnummer, t.ex. 070-1234567 eller +46701234567.";
     return;
   }
 
