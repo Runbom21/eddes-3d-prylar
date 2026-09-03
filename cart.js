@@ -106,15 +106,19 @@ function closeCart() {
   document.getElementById("cartOverlay").classList.remove("show");
 }
 
-// Kolla att telefonnumret ser rimligt ut
+// Kolla att telefonnumret är ett realistiskt svenskt mobilnummer
 function arTelefonGiltig(varde) {
   const v = (varde || "").trim();
 
-  // Telefonnummer: tillåt siffror, mellanslag, bindestreck och parenteser,
-  // med valfritt inledande "+" (t.ex. 070-1234567 eller +46701234567).
+  // Ta bort mellanslag, bindestreck och parenteser (t.ex. 070-1234567 eller +46701234567).
   const siffror = v.replace(/[\s\-()]/g, "");
-  const telefonRegex = /^\+?\d{7,15}$/;
-  return telefonRegex.test(siffror);
+
+  // Endast svenska mobilnummer accepteras:
+  // - Lokalt format: 07[02369] + 7 siffror (070/072/073/076/079), totalt 10 siffror
+  // - Internationellt format: +467[02369] + 7 siffror
+  const lokaltRegex = /^07[02369]\d{7}$/;
+  const internationelltRegex = /^\+467[02369]\d{7}$/;
+  return lokaltRegex.test(siffror) || internationelltRegex.test(siffror);
 }
 
 // Spärr: max en beställning per enhet per dag (svag spärr, men stoppar lat
@@ -169,7 +173,7 @@ function checkout() {
 
   if (!arTelefonGiltig(telefon)) {
     status.className = "cart-status fel";
-    status.textContent = "Ange ett giltigt telefonnummer (t.ex. 070-1234567 eller +46701234567).";
+    status.textContent = "Ange ett giltigt svenskt mobilnummer, t.ex. 070-1234567 eller +46701234567.";
     return;
   }
 
