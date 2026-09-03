@@ -3,6 +3,11 @@
 // Byt mejladressen nedan till Lukas riktiga adress:
 const BESTALLNINGS_MEJL = "lukas.b.runbom@gmail.com";
 
+// Backend som tar emot beställningen, kollar mejl-per-dag-spärren och
+// skickar bekräftelsemejlet till kunden (se kingof3d-backend/DEPLOYMENT.md
+// steg 4 – byt ut adressen nedan mot den riktiga Vercel-URL:en efter deploy).
+const BACKEND_URL = "https://kingof3d-backend.vercel.app";
+
 // Hämta sparad varukorg (eller en tom)
 let cart = JSON.parse(localStorage.getItem("kingof3d_cart") || "{}");
 
@@ -106,9 +111,17 @@ function closeCart() {
   document.getElementById("cartOverlay").classList.remove("show");
 }
 
-// Kolla att telefonnumret är ett realistiskt svenskt mobilnummer
+// Kolla att e-postadressen ser rimlig ut (samma regex som backendens validering.js)
+function arEpostGiltig(varde) {
+  const v = (varde || "").trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+// Kolla att telefonnumret är ett realistiskt svenskt mobilnummer (valfritt fält –
+// tomt är alltid OK, det obligatoriska kravet ligger numera på e-posten ovan).
 function arTelefonGiltig(varde) {
   const v = (varde || "").trim();
+  if (!v) return true;
 
   // Ta bort mellanslag, bindestreck och parenteser (t.ex. 070-1234567 eller +46701234567).
   const siffror = v.replace(/[\s\-()]/g, "");
@@ -119,6 +132,31 @@ function arTelefonGiltig(varde) {
   const lokaltRegex = /^07[02369]\d{7}$/;
   const internationelltRegex = /^\+467[02369]\d{7}$/;
   return lokaltRegex.test(siffror) || internationelltRegex.test(siffror);
+}
+
+// Spärr: kunder har visat sig klistra in butikens EGNA kontaktuppgifter
+// (Lukas Swish-nummer / mejladress) istället för sina egna – blockera det,
+// oavsett skrivsätt/skiftläge. Samma logik speglas server-side i
+// kingof3d-backend/api/_lib/validering.js (den auktoritativa spärren –
+// den här är bara för snabb feedback till en ärlig kund som råkat fel).
+const BUTIKENS_TELEFON_NORMALISERAT = "0763969751"; // "076-396 97 51" i cart-note nedan
+
+function normaliseraTelefon(varde) {
+  const siffror = (varde || "").trim().replace(/[\s\-()]/g, "");
+  if (siffror.indexOf("+46") === 0) return "0" + siffror.slice(3);
+  return siffror;
+}
+
+function arButikensTelefonnummer(varde) {
+  const v = (varde || "").trim();
+  if (!v) return false;
+  return normaliseraTelefon(v) === BUTIKENS_TELEFON_NORMALISERAT;
+}
+
+function arButikensEpost(varde) {
+  const v = (varde || "").trim().toLowerCase();
+  if (!v) return false;
+  return v === BESTALLNINGS_MEJL.trim().toLowerCase();
 }
 
 // Spärr: max en beställning per enhet per dag (svag spärr, men stoppar lat
@@ -134,7 +172,9 @@ function markeraBestalldIdag() {
   localStorage.setItem(SENASTE_BESTALLNING_NYCKEL, idagsDatum());
 }
 
-// Skicka beställning – skickas direkt till butikens inkorg via FormSubmit
+// Skicka beställning – går via backend (/api/order), som mejlar en
+// bekräftelselänk till kundens egen adress. Ordern går INTE till Lukas
+// inkorg förrän kunden klickar länken (se kingof3d-backend/api/confirm.js).
 function checkout() {
   const names = Object.keys(cart);
   const status = document.getElementById("cartStatus");
@@ -144,6 +184,7 @@ function checkout() {
   }
 
   const namn = (document.getElementById("kundNamn").value || "").trim();
+  const epost = (document.getElementById("kundEpost").value || "").trim();
   const telefon = (document.getElementById("kundTelefon").value || "").trim();
   const adress = (document.getElementById("kundAdress").value || "").trim();
   const meddelande = (document.getElementById("kundMeddelande").value || "").trim();
@@ -151,12 +192,12 @@ function checkout() {
   const honeypot = (honeypotFalt ? honeypotFalt.value : "").trim();
 
   // Honeypot ifylld = nästan säkert en bot. Låtsas att allt gick bra men
-  // skicka aldrig något till FormSubmit, så botten inte lär sig att den avslöjades.
+  // gör inget anrop alls, så botten inte lär sig att den avslöjades.
   if (honeypot) {
     cart = {};
     saveCart();
     renderCart();
-    ["kundNamn", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+    ["kundNamn", "kundEpost", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
       const el = document.getElementById(id);
       if (el) el.value = "";
     });
@@ -165,15 +206,33 @@ function checkout() {
     return;
   }
 
-  if (!namn || !telefon) {
+  if (!namn || !epost) {
     status.className = "cart-status fel";
-    status.textContent = "Fyll i ditt namn och ditt telefonnummer först.";
+    status.textContent = "Fyll i ditt namn och din e-postadress först.";
+    return;
+  }
+
+  if (!arEpostGiltig(epost)) {
+    status.className = "cart-status fel";
+    status.textContent = "Ange en giltig e-postadress.";
+    return;
+  }
+
+  if (arButikensEpost(epost)) {
+    status.className = "cart-status fel";
+    status.textContent = "Ange din egen e-postadress, inte butikens.";
     return;
   }
 
   if (!arTelefonGiltig(telefon)) {
     status.className = "cart-status fel";
-    status.textContent = "Ange ett giltigt svenskt mobilnummer, t.ex. 070-1234567 eller +46701234567.";
+    status.textContent = "Ange ett giltigt svenskt mobilnummer, t.ex. 070-1234567 eller +46701234567 – eller lämna fältet tomt.";
+    return;
+  }
+
+  if (arButikensTelefonnummer(telefon)) {
+    status.className = "cart-status fel";
+    status.textContent = "Ange ditt eget telefonnummer, inte butikens.";
     return;
   }
 
@@ -183,10 +242,9 @@ function checkout() {
     return;
   }
 
-  let orderLines = "";
-  names.forEach(function (name) {
+  const artiklar = names.map(function (name) {
     const item = cart[name];
-    orderLines += item.qty + " x " + name + " (" + item.price + " kr/st)\n";
+    return { namn: name, pris: item.price, antal: item.qty };
   });
   const frakt = cartTotal() >= 300 ? "Fri frakt" : "Frakt tillkommer (beställning under 300 kr)";
 
@@ -195,41 +253,45 @@ function checkout() {
   status.className = "cart-status";
   status.textContent = "Skickar din beställning…";
 
-  fetch("https://formsubmit.co/ajax/" + BESTALLNINGS_MEJL, {
+  fetch(BACKEND_URL + "/api/order", {
     method: "POST",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({
-      _subject: "Ny beställning – King of 3D",
-      _template: "table",
-      // FormSubmits inbyggda reCAPTCHA visas som en mellansida vid vanlig
-      // formulär-navigering och fungerar inte över AJAX-anropet (ingen sida
-      // att visa utmaningen på) – därför är den avstängd här. Det faktiska
-      // bot-skyddet för AJAX-flödet är honeypot-fältet nedan (_honey), som
-      // FormSubmit kollar server-side oavsett _captcha-läge.
-      _captcha: "false",
-      _honey: honeypot,
-      Namn: namn,
-      Telefon: telefon,
-      Leveransadress: adress || "-",
-      "Önskemål / meddelande": meddelande || "-",
-      Beställning: orderLines,
-      Totalt: cartTotal() + " kr",
-      Frakt: frakt,
+      namn: namn,
+      epost: epost,
+      telefon: telefon,
+      adress: adress,
+      meddelande: meddelande,
+      artiklar: artiklar,
+      totalt: cartTotal(),
+      frakt: frakt,
+      webbplats: honeypot,
     }),
   })
-    .then(function (r) { return r.json(); })
-    .then(function () {
+    .then(function (r) {
+      return r.json().then(function (data) { return { status: r.status, data: data }; });
+    })
+    .then(function (svar) {
+      btn.disabled = false;
+      if (!svar.data || !svar.data.ok) {
+        status.className = "cart-status fel";
+        status.textContent =
+          (svar.data && svar.data.fel) ||
+          "Kunde inte skicka just nu. Försök igen, eller mejla oss på " + BESTALLNINGS_MEJL + ".";
+        return;
+      }
+
       markeraBestalldIdag();
       cart = {};
       saveCart();
       renderCart();
-      ["kundNamn", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
+      ["kundNamn", "kundEpost", "kundTelefon", "kundAdress", "kundMeddelande", "kundWebbplats"].forEach(function (id) {
         const el = document.getElementById(id);
         if (el) el.value = "";
       });
       status.className = "cart-status ok";
-      status.textContent = "✅ Tack! Din beställning är skickad – vi hör av oss snart.";
-      btn.disabled = false;
+      status.textContent =
+        "✅ Kolla din mejl (" + epost + ") och klicka på bekräftelselänken för att slutföra beställningen. Länken är giltig i 48 timmar.";
     })
     .catch(function () {
       status.className = "cart-status fel";
