@@ -8,32 +8,49 @@ const BESTALLNINGS_MEJL = "lukas.b.runbom@gmail.com";
 // steg 4 – byt ut adressen nedan mot den riktiga Vercel-URL:en efter deploy).
 const BACKEND_URL = "https://kingof3d-backend.vercel.app";
 
-// Hämta sparad varukorg (eller en tom)
+// Hämta sparad varukorg (eller en tom). Nyckeln är "produktnamn|färg" så att
+// samma pryl i olika färger kan ligga som separata rader – se cartKey().
+// Gamla sparade varukorgar (från innan färgval fanns) saknar namn/farg-fälten;
+// de filtreras defensivt bort nedan (item && item.qty) istället för att
+// migreras – en enkel hobbybutik behöver ingen migreringslogik för det.
 let cart = JSON.parse(localStorage.getItem("kingof3d_cart") || "{}");
+
+// Bygg varukorgsnyckeln av produktnamn + färg
+function cartKey(name, farg) {
+  return name + "|" + farg;
+}
 
 // Spara varukorgen
 function saveCart() {
   localStorage.setItem("kingof3d_cart", JSON.stringify(cart));
 }
 
-// Lägg till en vara
-function addToCart(name, price) {
-  if (cart[name]) {
-    cart[name].qty += 1;
+// Hämta bara giltiga rader (skyddar mot gamla/trasiga localStorage-format)
+function cartKeys() {
+  return Object.keys(cart).filter(function (k) {
+    return cart[k] && cart[k].qty > 0;
+  });
+}
+
+// Lägg till en vara i en viss färg
+function addToCart(name, price, farg) {
+  const key = cartKey(name, farg);
+  if (cart[key] && cart[key].qty) {
+    cart[key].qty += 1;
   } else {
-    cart[name] = { price: price, qty: 1 };
+    cart[key] = { price: price, qty: 1, namn: name, farg: farg };
   }
   saveCart();
   renderCart();
   openCart();
 }
 
-// Ändra antal (delta = +1 eller -1)
-function changeQty(name, delta) {
-  if (!cart[name]) return;
-  cart[name].qty += delta;
-  if (cart[name].qty <= 0) {
-    delete cart[name];
+// Ändra antal (delta = +1 eller -1) för en given varukorgsrad (nyckel)
+function changeQty(key, delta) {
+  if (!cart[key] || !cart[key].qty) return;
+  cart[key].qty += delta;
+  if (cart[key].qty <= 0) {
+    delete cart[key];
   }
   saveCart();
   renderCart();
@@ -42,39 +59,40 @@ function changeQty(name, delta) {
 // Räkna ut totalsumman
 function cartTotal() {
   let total = 0;
-  for (const name in cart) {
-    total += cart[name].price * cart[name].qty;
-  }
+  cartKeys().forEach(function (key) {
+    total += cart[key].price * cart[key].qty;
+  });
   return total;
 }
 
 // Rita upp varukorgen i panelen
 function renderCart() {
   const itemsBox = document.getElementById("cartItems");
-  const names = Object.keys(cart);
+  const keys = cartKeys();
 
   // Antal-bubblan i toppen
   let antal = 0;
-  names.forEach((n) => (antal += cart[n].qty));
+  keys.forEach((k) => (antal += cart[k].qty));
   document.getElementById("cartCount").textContent = antal;
 
   // Tom varukorg
-  if (names.length === 0) {
+  if (keys.length === 0) {
     itemsBox.innerHTML = '<p class="cart-empty">Din varukorg är tom 🛒<br>Lägg till en pryl för att börja!</p>';
   } else {
-    itemsBox.innerHTML = names
-      .map(function (name) {
-        const item = cart[name];
+    itemsBox.innerHTML = keys
+      .map(function (key) {
+        const item = cart[key];
+        const rubrik = item.namn + (item.farg ? " — " + item.farg : "");
         return (
           '<div class="cart-item">' +
             '<div class="cart-item-info">' +
-              '<strong>' + name + '</strong>' +
+              '<strong>' + rubrik + '</strong>' +
               '<span>' + item.price + ' kr/st</span>' +
             '</div>' +
             '<div class="qty">' +
-              '<button class="qty-btn" data-name="' + name + '" data-delta="-1">−</button>' +
+              '<button class="qty-btn" data-key="' + key + '" data-delta="-1">−</button>' +
               '<span class="qty-num">' + item.qty + '</span>' +
-              '<button class="qty-btn" data-name="' + name + '" data-delta="1">+</button>' +
+              '<button class="qty-btn" data-key="' + key + '" data-delta="1">+</button>' +
             '</div>' +
             '<div class="cart-item-sum">' + item.price * item.qty + ' kr</div>' +
           '</div>'
@@ -182,9 +200,9 @@ function markeraBestalldIdag() {
 // bekräftelselänk till kundens egen adress. Ordern går INTE till Lukas
 // inkorg förrän kunden klickar länken (se kingof3d-backend/api/confirm.js).
 function checkout() {
-  const names = Object.keys(cart);
+  const keys = cartKeys();
   const status = document.getElementById("cartStatus");
-  if (names.length === 0) {
+  if (keys.length === 0) {
     alert("Din varukorg är tom – lägg till något först!");
     return;
   }
@@ -254,9 +272,9 @@ function checkout() {
     return;
   }
 
-  const artiklar = names.map(function (name) {
-    const item = cart[name];
-    return { namn: name, pris: item.price, antal: item.qty };
+  const artiklar = keys.map(function (key) {
+    const item = cart[key];
+    return { namn: item.namn, pris: item.price, antal: item.qty, farg: item.farg };
   });
   const frakt = cartTotal() >= 300 ? "Fri frakt" : "Frakt tillkommer (beställning under 300 kr)";
 
@@ -312,11 +330,10 @@ function checkout() {
     });
 }
 
-// ===== Färgprickar =====
-// Lukas printar i samma nio filamentfärger oavsett pryl. Prickarna är bara
-// en visuell fingervisning om vilka färger som finns – kunden anger
-// fortfarande sin önskade färg i fritextfältet vid checkout, det här
-// påverkar inte varukorgen eller beställningsdatan.
+// ===== Färgval =====
+// Lukas printar i samma nio filamentfärger oavsett pryl. Prickarna är
+// klickbara – kunden väljer en färg per kort (single-select), och den valda
+// färgen följer med varan in i varukorgen och beställningen.
 // Byggs en gång och klonas in i varje .card istället för att duplicera
 // samma HTML nio gånger per kort direkt i index.html – slipper risken att
 // missa ett kort eller råka stava fel i en kopia.
@@ -335,35 +352,89 @@ const FILAMENT_FARGER = [
 function byggFargprickar() {
   const rad = document.createElement("div");
   rad.className = "color-dots";
+  rad.setAttribute("role", "group");
+  rad.setAttribute("aria-label", "Välj färg");
   FILAMENT_FARGER.forEach(function (farg) {
-    const prick = document.createElement("span");
+    const prick = document.createElement("button");
+    prick.type = "button";
     prick.className = "color-dot" + (farg.kant ? " color-dot-kant" : "");
     prick.style.background = farg.hex;
     prick.title = farg.namn;
-    prick.setAttribute("role", "img");
     prick.setAttribute("aria-label", farg.namn);
+    prick.setAttribute("aria-pressed", "false");
+    prick.dataset.farg = farg.namn;
     rad.appendChild(prick);
   });
   return rad;
 }
 
+// Lägg till färgprickar + en (dold) varningstext per kort, och koppla
+// klick på prickarna till val av färg (single-select, sparas på kortet i
+// data-vald-farg så add-btn-hanteraren kan läsa av det).
 function laggTillFargprickar() {
   document.querySelectorAll(".card").forEach(function (card) {
     if (card.querySelector(".color-dots")) return; // redan tillagd
-    card.appendChild(byggFargprickar());
+
+    const rad = byggFargprickar();
+    card.appendChild(rad);
+
+    const varning = document.createElement("p");
+    varning.className = "color-required-msg";
+    varning.textContent = "Välj en färg innan du lägger i varukorgen";
+    varning.hidden = true;
+    card.appendChild(varning);
+
+    rad.addEventListener("click", function (e) {
+      const prick = e.target.closest(".color-dot");
+      if (!prick) return;
+      rad.querySelectorAll(".color-dot").forEach(function (d) {
+        d.classList.remove("selected");
+        d.setAttribute("aria-pressed", "false");
+      });
+      prick.classList.add("selected");
+      prick.setAttribute("aria-pressed", "true");
+      card.dataset.valdFarg = prick.dataset.farg;
+
+      // Färg vald – släck ev. kvarvarande "välj färg"-indikation.
+      rad.classList.remove("behover-val");
+      varning.hidden = true;
+    });
+
+    // Tillåt att pulsanimationen kan spelas upp igen om kunden klickar
+    // KÖP NU flera gånger utan att välja färg.
+    rad.addEventListener("animationend", function () {
+      rad.classList.remove("behover-val");
+    });
   });
+}
+
+// Visa den icke-påträngande "välj en färg"-indikationen på ett kort
+function visaFargSaknasIndikation(card) {
+  const rad = card.querySelector(".color-dots");
+  const varning = card.querySelector(".color-required-msg");
+  if (rad) {
+    rad.classList.remove("behover-val");
+    void rad.offsetWidth; // forcera reflow så animationen kan köras om
+    rad.classList.add("behover-val");
+  }
+  if (varning) varning.hidden = false;
 }
 
 // ===== Koppla ihop knappar när sidan laddat =====
 document.addEventListener("DOMContentLoaded", function () {
   laggTillFargprickar();
 
-  // "Lägg i varukorg"-knapparna
+  // "Lägg i varukorg"-knapparna – kräver att en färg är vald på kortet
   document.querySelectorAll(".card").forEach(function (card) {
     const btn = card.querySelector(".add-btn");
     if (!btn) return;
     btn.addEventListener("click", function () {
-      addToCart(card.dataset.name, Number(card.dataset.price));
+      const farg = card.dataset.valdFarg;
+      if (!farg) {
+        visaFargSaknasIndikation(card);
+        return;
+      }
+      addToCart(card.dataset.name, Number(card.dataset.price), farg);
     });
   });
 
@@ -371,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("cartItems").addEventListener("click", function (e) {
     const btn = e.target.closest(".qty-btn");
     if (!btn) return;
-    changeQty(btn.dataset.name, Number(btn.dataset.delta));
+    changeQty(btn.dataset.key, Number(btn.dataset.delta));
   });
 
   // Öppna/stäng-knappar
