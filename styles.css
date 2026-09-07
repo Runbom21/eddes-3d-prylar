@@ -313,6 +313,28 @@ body {
 }
 .add-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(227,181,58,0.4); }
 
+/* Färgprickar – visar vilka filamentfärger som finns att välja (samma nio
+   för alla prylar). Injiceras av cart.js så markupen inte behöver
+   dupliceras i varje produktkort i index.html. Rent visuellt – påverkar
+   inte varukorgslogiken. */
+.color-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #26262e;
+}
+.color-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor: default;
+}
+.color-dot-kant { border-color: rgba(155,151,168,0.65); }
+
 /* ====== "Så funkar det"-steg ====== */
 .steps {
   display: grid;
@@ -501,4 +523,6 @@ body {
   .logo { height: 52px; }
   .hero2 h1 { font-size: 1.8rem; }
   .topbar-inner { justify-content: center; gap: 1rem; }
+  .color-dots { gap: 0.35rem; margin-top: 0.65rem; padding-top: 0.6rem; }
+  .color-dot { width: 14px; height: 14px; }
 }

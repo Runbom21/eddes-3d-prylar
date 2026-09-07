@@ -312,8 +312,52 @@ function checkout() {
     });
 }
 
+// ===== Färgprickar =====
+// Lukas printar i samma nio filamentfärger oavsett pryl. Prickarna är bara
+// en visuell fingervisning om vilka färger som finns – kunden anger
+// fortfarande sin önskade färg i fritextfältet vid checkout, det här
+// påverkar inte varukorgen eller beställningsdatan.
+// Byggs en gång och klonas in i varje .card istället för att duplicera
+// samma HTML nio gånger per kort direkt i index.html – slipper risken att
+// missa ett kort eller råka stava fel i en kopia.
+const FILAMENT_FARGER = [
+  { namn: "Svart", hex: "#111111" },
+  { namn: "Vit", hex: "#ffffff", kant: true },
+  { namn: "Blå", hex: "#2563eb" },
+  { namn: "Gul", hex: "#facc15", kant: true },
+  { namn: "Röd", hex: "#dc2626" },
+  { namn: "Grön", hex: "#16a34a" },
+  { namn: "Guld", hex: "var(--guld)" },
+  { namn: "Orange", hex: "#f97316" },
+  { namn: "Turkos", hex: "#14b8a6" },
+];
+
+function byggFargprickar() {
+  const rad = document.createElement("div");
+  rad.className = "color-dots";
+  FILAMENT_FARGER.forEach(function (farg) {
+    const prick = document.createElement("span");
+    prick.className = "color-dot" + (farg.kant ? " color-dot-kant" : "");
+    prick.style.background = farg.hex;
+    prick.title = farg.namn;
+    prick.setAttribute("role", "img");
+    prick.setAttribute("aria-label", farg.namn);
+    rad.appendChild(prick);
+  });
+  return rad;
+}
+
+function laggTillFargprickar() {
+  document.querySelectorAll(".card").forEach(function (card) {
+    if (card.querySelector(".color-dots")) return; // redan tillagd
+    card.appendChild(byggFargprickar());
+  });
+}
+
 // ===== Koppla ihop knappar när sidan laddat =====
 document.addEventListener("DOMContentLoaded", function () {
+  laggTillFargprickar();
+
   // "Lägg i varukorg"-knapparna
   document.querySelectorAll(".card").forEach(function (card) {
     const btn = card.querySelector(".add-btn");
