@@ -159,6 +159,12 @@ function arButikensEpost(varde) {
   return v === BESTALLNINGS_MEJL.trim().toLowerCase();
 }
 
+// Spärr: max ordersumma just nu (ägarens beslut). Detta är bara för snabb
+// feedback till kunden – den auktoritativa spärren ligger i backendens
+// api/_lib/validering.js (den här går att kringgå genom att anropa
+// /api/order direkt, så backend kan inte lita på att frontend inte manipulerats).
+const MAX_ORDERSUMMA = 600;
+
 // Spärr: max en beställning per enhet per dag (svag spärr, men stoppar lat
 // upprepad pranking – kringgås trivialt av den som rensar cache/inkognito).
 const SENASTE_BESTALLNING_NYCKEL = "kingof3d_last_order_date";
@@ -180,6 +186,12 @@ function checkout() {
   const status = document.getElementById("cartStatus");
   if (names.length === 0) {
     alert("Din varukorg är tom – lägg till något först!");
+    return;
+  }
+
+  if (cartTotal() > MAX_ORDERSUMMA) {
+    status.className = "cart-status fel";
+    status.textContent = "Max ordersumma är " + MAX_ORDERSUMMA + " kr just nu — dela upp i flera beställningar eller minska antalet varor.";
     return;
   }
 
