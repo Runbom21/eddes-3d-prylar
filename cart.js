@@ -321,7 +321,7 @@ function checkout() {
 // samma HTML nio gånger per kort direkt i index.html – slipper risken att
 // missa ett kort eller råka stava fel i en kopia.
 const FILAMENT_FARGER = [
-  { namn: "Svart", hex: "#111111" },
+  { namn: "Svart", hex: "#111111", kant: true },
   { namn: "Vit", hex: "#ffffff", kant: true },
   { namn: "Blå", hex: "#2563eb" },
   { namn: "Gul", hex: "#facc15", kant: true },
